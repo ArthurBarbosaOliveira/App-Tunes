@@ -1,4 +1,5 @@
 import React from 'react';
+import Header from './components/Header';
 import Album from './pages/Album';
 import Favorites from './pages/Favorites';
 import Login from './pages/Login';
@@ -12,6 +13,7 @@ class App extends React.Component {
     return (
       <>
         <Login />
+        <Header />
         <Search />
         <Album />
         <Favorites />

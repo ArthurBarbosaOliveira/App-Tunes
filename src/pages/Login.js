@@ -2,7 +2,7 @@ import React from 'react';
 import { Redirect } from 'react-router-dom';
 import { createUser } from '../services/userAPI';
 
-class Login extends React.Component {
+export default class Login extends React.Component {
   state = {
     isDisabled: true,
     inputUser: '',
@@ -42,6 +42,7 @@ class Login extends React.Component {
       <div data-testid="page-login">
         <form onSubmit={ this.handleClick }>
           <label htmlFor="inputUser">
+            Usuario:
             <input
               data-testid="login-name-input"
               onChange={ this.handleChange }
@@ -61,5 +62,3 @@ class Login extends React.Component {
     );
   }
 }
-
-export default Login;
