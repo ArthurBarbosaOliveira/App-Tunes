@@ -1,43 +1,48 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { getUser } from '../services/userAPI';
+import Carregando from './Carregando';
 
 export default class Header extends React.Component {
-  state = {
-    login: '',
-    carregando: true,
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      login: '',
+      carregando: false,
+    };
   }
 
-  async componentDidMount() {
-    const { name } = await getUser();
-    this.setState({ login: name, carregando: false });
+  componentDidMount() {
+    this.handleLogin();
   }
-  // tem que usar name, para buscar certo na API, por isso não passava no ultimo requisito do test
+
+  handleLogin = () => {
+    this.setState({ carregando: true }, async () => {
+      const { name } = await getUser();
+      this.setState({
+        login: name,
+        carregando: false,
+      });
+    });
+  }
 
   render() {
     const { login, carregando } = this.state;
-    if (carregando) return <span>Carregando...</span>;
+
     return (
       <header data-testid="header-component">
-        <h3 data-testid="header-user-name">
-          { login }
-        </h3>
+        {
+          carregando
+            ? <Carregando />
+            : <p data-testid="header-user-name">{ login }</p>
+        }
         <nav>
-          <button type="button">
-            <Link to="/search" data-testid="link-to-search">
-              Pesquisar
-            </Link>
-          </button>
-          <button type="button">
-            <Link to="/favorites" data-testid="link-to-favorites">
-              Favoritas
-            </Link>
-          </button>
-          <button type="button">
-            <Link to="/profile" data-testid="link-to-profile">
-              Perfil
-            </Link>
-          </button>
+          <Link to="/search" data-testid="link-to-search"> Search </Link>
+          <Link to="/favorites" data-testid="link-to-favorites">
+            Músicas Favoritas
+          </Link>
+          <Link to="/profile" data-testid="link-to-profile"> Perfil </Link>
         </nav>
       </header>
     );
