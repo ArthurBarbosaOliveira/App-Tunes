@@ -13,34 +13,42 @@ class MusicCard extends React.Component {
     };
   }
 
-  componentDidMount() {
-    this.CheckedSong();
-  }
-
     FavoriteSong = () => {
       const { props } = this;
       const dataSong = {
-        trackId: props.trackId,
-        trackName: props.trackName,
+        amgArtistId: props.amgArtistId,
+        artistId: props.artistId,
+        artistName: props.artistName,
+        artistViewUrl: props.artistViewUrl,
+        artworkUrl60: props.artworkUrl60,
+        artworkUrl100: props.artworkUrl100,
+        collectionCensoredName: props.collectionCensoredName,
+        collectionExplicitness: props.collectionExplicitness,
+        collectionId: props.collectionId,
+        collectionName: props.collectionName,
+        collectionPrice: props.collectionPrice,
+        collectionType: props.collectionType,
+        collectionViewUrl: props.collectionViewUrl,
+        contentAdvisoryRating: props.contentAdvisoryRating,
+        copyright: props.copyright,
+        country: props.country,
+        currency: props.currency,
+        primaryGenreName: props.primaryGenreName,
+        releaseDate: props.releaseDate,
+        trackCount: props.trackCount,
+        wrapperType: props.wrapperType,
       };
 
       this.setState({ carregando: true }, async () => {
         const resultado = await addSong(dataSong);
-        if (resultado === 'OK') this.setState({ carregando: false });
+        this.setState({ carregando: false, checked: resultado === 'OK' });
       });
     };
 
-    CheckedChange = () => {
+    CheckedSong = () => {
       this.setState((prev) => ({
         checked: !prev.checked,
       }));
-    }
-
-    CheckedSong = () => {
-      const { fav, trackId } = this.props;
-      if (fav.some((element) => element.trackId === trackId)) {
-        this.setState({ checked: true });
-      }
     }
 
     track = () => {
@@ -56,7 +64,7 @@ class MusicCard extends React.Component {
               data-testid={ `checkbox-music-${trackId}` }
               type="checkbox"
               id="favorite"
-              onChange={ this.CheckedChange }
+              onChange={ this.CheckedSong }
               onClick={ this.FavoriteSong }
               checked={ checked }
             />
