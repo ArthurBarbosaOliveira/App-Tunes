@@ -20,32 +20,13 @@ class MusicCard extends React.Component {
     FavoriteSong = () => {
       const { props } = this;
       const dataSong = {
-        amgArtistId: props.amgArtistId,
-        artistId: props.artistId,
-        artistName: props.artistName,
-        artistViewUrl: props.artistViewUrl,
-        artworkUrl60: props.artworkUrl60,
-        artworkUrl100: props.artworkUrl100,
-        collectionCensoredName: props.collectionCensoredName,
-        collectionExplicitness: props.collectionExplicitness,
-        collectionId: props.collectionId,
-        collectionName: props.collectionName,
-        collectionPrice: props.collectionPrice,
-        collectionType: props.collectionType,
-        collectionViewUrl: props.collectionViewUrl,
-        contentAdvisoryRating: props.contentAdvisoryRating,
-        copyright: props.copyright,
-        country: props.country,
-        currency: props.currency,
-        primaryGenreName: props.primaryGenreName,
-        releaseDate: props.releaseDate,
-        trackCount: props.trackCount,
-        wrapperType: props.wrapperType,
+        trackId: props.trackId,
+        tracnkName: props.trackName,
       };
 
       this.setState({ carregando: true }, async () => {
         const resultado = await addSong(dataSong);
-        this.setState({ carregando: false, checked: resultado === 'OK' });
+        if (resultado === 'OK') this.setState({ carregando: false });
       });
     };
 
