@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { addSong } from '../services/favoriteSongsAPI';
+import { addSong, removeSong } from '../services/favoriteSongsAPI';
 import Carregando from './Carregando';
 
 class MusicCard extends React.Component {
-  constructor(props) {
-    super(props);
+  constructor() {
+    super();
 
     this.state = {
       carregando: false,
@@ -13,74 +13,70 @@ class MusicCard extends React.Component {
     };
   }
 
-  componentDidMount() {
+  componentDidMount = () => {
     this.CheckedSong();
   }
 
-    FavoriteSong = () => {
-      const { props } = this;
-      const dataSong = {
-        trackId: props.trackId,
-        tracnkName: props.trackName,
-      };
+  FavoriteSong = async () => {
+    this.setState({ carregando: true });
+    const { checked } = this.state;
+    const { objeto, update } = this.props;
 
-      this.setState({ carregando: true }, async () => {
-        const resultado = await addSong(dataSong);
-        if (resultado === 'OK') this.setState({ carregando: false });
-      });
-    };
+    if (!checked) await addSong(objeto);
 
-    CheckedMusic = () => {
-      this.setState((prev) => ({
-        checked: !prev.checked,
-      }));
+    if (checked) await removeSong(objeto);
+
+    this.setState({ carregando: false });
+
+    if (update !== undefined) update();
+  }
+
+  CheckedMusic = ({ target }) => this.setState({ checked: target.checked })
+
+  CheckedSong = () => {
+    const { favorites, objeto } = this.props;
+    if (favorites.some((element) => element.trackId === objeto.trackId)) {
+      this.setState({ checked: true });
     }
+  }
 
-    CheckedSong = () => {
-      const { fav, trackId } = this.props;
-      if (fav.some((element) => element.trackId === trackId)) {
-        this.setState({ checked: true });
-      }
-    }
-
-    track = () => {
-      const { trackId, trackName, previewUrl } = this.props;
-      const { checked } = this.state;
-
-      return (
-        <>
-          <span>{trackName}</span>
-          <label htmlFor="favorite">
-            Favorita
-            <input
-              data-testid={ `checkbox-music-${trackId}` }
-              type="checkbox"
-              id="favorite"
-              onChange={ this.CheckedMusic }
-              onClick={ this.FavoriteSong }
-              checked={ checked }
-            />
-          </label>
-          <audio data-testid="audio-component" src={ previewUrl } controls>
-            <track kind="captions" />
-            O seu navegador não suporta o elemento
-            {' '}
-            <code>audio</code>
-            .
-          </audio>
-        </>
-      );
-    };
-
-    render() {
-      const { carregando } = this.state;
-      return (carregando ? <Carregando /> : this.track());
-    }
+  render() {
+    const { objeto } = this.props;
+    const { carregando, checked } = this.state;
+    return (
+      <>
+        { carregando && <Carregando /> }
+        { !carregando && (
+          <div>
+            <label htmlFor="favorite">
+              Favorita
+              <input
+                data-testid={ `checkbox-music-${objeto.trackId}` }
+                type="checkbox"
+                id="favorite"
+                onChange={ this.FavoriteSong }
+                onClick={ this.CheckedMusic }
+                checked={ checked }
+              />
+            </label>
+            <span>{ objeto.trackName }</span>
+            <audio data-testid="audio-component" src={ objeto.previewUrl } controls>
+              <track kind="captions" />
+              O seu navegador não suporta o elemento
+              {' '}
+              <code>audio</code>
+              .
+            </audio>
+          </div>)}
+      </>
+    );
+  }
 }
 
 MusicCard.propTypes = {
-  trackName: PropTypes.string,
-  previewUrl: PropTypes.string,
-}.isRequired;
+  objeto: PropTypes.func.isRequired,
+  favorites: PropTypes.func.isRequired,
+  update: PropTypes.func.isRequired,
+};
 
 export default MusicCard;

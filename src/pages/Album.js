@@ -3,62 +3,71 @@ import PropTypes from 'prop-types';
 import Header from '../components/Header';
 import getMusics from '../services/musicsAPI';
 import MusicCard from '../components/MusicCard';
-import { getFavoriteSongs, removeSong } from '../services/favoriteSongsAPI';
+import Carregando from '../components/Carregando';
+import { getFavoriteSongs } from '../services/favoriteSongsAPI';
 
 class Album extends React.Component {
-  constructor(props) {
-    super(props);
+  constructor() {
+    super();
+
     this.state = {
-      dataArtist: {},
-      data: [],
-      favoritos: [],
+      musicas: '',
+      carregando: false,
+      tela: false,
     };
   }
 
-  componentDidMount() {
+  componentDidMount = () => {
     this.buscarGetMusic();
+    this.buscarGetFavorite();
+  }
+
+  buscarGetFavorite = async () => {
+    this.setState({ carregando: true });
+    const resultadoFav = await getFavoriteSongs();
+    this.setState({ resultadoFav, carregando: false });
   }
 
   buscarGetMusic = async () => {
     const { match } = this.props;
     const resultado = await getMusics(match.params.id);
-    const resultadoFav = await getFavoriteSongs();
-    const [dataArtist, ...resto] = resultado;
-    resultadoFav.map((element) => removeSong(element));
-    this.setState({ data: resto, dataArtist, favoritos: resultadoFav });
-  };
+
+    this.setState({ musicas: resultado, tela: true });
+  }
 
   render() {
-    const { data, dataArtist, favoritos } = this.state;
-    const { artistName, collectionName } = dataArtist;
+    const { tela, musicas, carregando, resultadoFav } = this.state;
     return (
-      <>
+      <div data-testid="page-album">
         <Header />
-        <div data-testid="page-album">
-          <p data-testid="artist-name">
-            {artistName}
-          </p>
-
-          <p data-testid="album-name">
-            {collectionName}
-            {artistName}
-          </p>
-          {data.map(
-            (item, index) => (<MusicCard
-              { ...item }
-              key={ index }
-              fav={ favoritos }
-            />),
+        { carregando ? <Carregando />
+          : (
+            <>
+              <p>Album</p>
+              { tela && (
+                <div className="music-card" key={ musicas[0].trackCount }>
+                  <img src={ musicas[0].artworkUrl100 } alt={ musicas[0].artistName } />
+                  <span data-testid="artist-name">{ musicas[0].artistName }</span>
+                  <span data-testid="album-name">{ musicas[0].collectionName }</span>
+                </div>
+              ) }
+              { tela && musicas.map((index) => {
+                if (typeof index.previewUrl === 'undefined') return '';
+                return (<MusicCard
+                  key={ index.trackCount }
+                  objeto={ index }
+                  favorites={ resultadoFav }
+                />);
+              })}
+            </>
           )}
-
-        </div>
-      </>
+      </div>
     );
   }
 }
 
 Album.propTypes = {
-  encontro: PropTypes.array,
-}.isRequired;
+  match: PropTypes.objectOf.isRequired,
+};
 
 export default Album;
