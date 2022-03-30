@@ -13,6 +13,10 @@ class MusicCard extends React.Component {
     };
   }
 
+  componentDidMount() {
+    this.CheckedSong();
+  }
+
     FavoriteSong = () => {
       const { props } = this;
       const dataSong = {
@@ -45,10 +49,17 @@ class MusicCard extends React.Component {
       });
     };
 
-    CheckedSong = () => {
+    CheckedMusic = () => {
       this.setState((prev) => ({
         checked: !prev.checked,
       }));
+    }
+
+    CheckedSong = () => {
+      const { fav, trackId } = this.props;
+      if (fav.some((element) => element.trackId === trackId)) {
+        this.setState({ checked: true });
+      }
     }
 
     track = () => {
@@ -64,7 +75,7 @@ class MusicCard extends React.Component {
               data-testid={ `checkbox-music-${trackId}` }
               type="checkbox"
               id="favorite"
-              onChange={ this.CheckedSong }
+              onChange={ this.CheckedMusic }
               onClick={ this.FavoriteSong }
               checked={ checked }
             />
